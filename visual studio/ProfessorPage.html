@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Professor</title>
+</head>
+
+<body>
+	<input type="button" value="데이타 전송 시작" onclick="startRecord();">
+	<input type="button" value="데이타 전송 종료" onclick="stopRecord()">
+	
+	<script src="//www.WebRTC-Experiment.com/RecordRTC.js"></script>
+	<script src="BinaryJS.js"></script>
+	<script>
+		var client = new BinaryClient('ws://127.0.0.1:3306');
+
+		client.on('open', function () {
+			// for the sake of this example let's put the stream in the window
+			window.Stream = client.createStream();
+
+		});
+
+		var audioInput;
+		var recorder;
+		var context;
+		var check = 1;
+
+		function startRecord() {
+
+			alert("전송시작");
+			var buffer = [];
+
+			var session = {
+				audio: true,
+				video: false
+			};
+			var recordRTC = null;
+			navigator.getUserMedia(session, initializeRecorder, onError => function () {
+				console.log("error");
+			});
+
+			function initializeRecorder(stream) {
+				var audioContext = window.AudioContext;
+				context = new audioContext();
+				audioInput = context.createMediaStreamSource(stream);
+				var bufferSize = 2048;
+				
+				// create a javascript node
+				recorder = context.createScriptProcessor(bufferSize, 1, 1);
+				
+				//var recorder = new MediaRecorder(stream, {mimeType:'audio/webm'});
+				// specify the processing function
+				recorder.onaudioprocess = recorderProcess;
+				//recorder.ondataavailable = recorderProcess;
+				// connect stream to our recorder
+				audioInput.connect(recorder);
+				// connect our recorder to the previous destination
+				recorder.connect(context.destination);
+			}
+
+			function convertFloat32ToInt16(buffer) {
+				l = buffer.length;
+				buf = new Int16Array(l);
+				while (l--) {
+					buf[l] = Math.min(1, buffer[l]) * 0x7FFF;
+				}
+				return buf.buffer;
+			}
+
+			function recorderProcess(e) {
+				var left = e.inputBuffer.getChannelData(0);
+				window.Stream.write(convertFloat32ToInt16(left));
+			}
+
+
+
+		}
+		function stopRecord() {
+			alert("전송종료");
+			audioInput.disconnect();
+			recorder.disconnect(context.destination);
+		}
+	</script>
+</body>
+
+</html>

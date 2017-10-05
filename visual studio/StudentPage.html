@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>client</title>
+        <style>
+.chat_log{width:95%;height: 200px;}
+.name{width:10%;}
+.message{width:70%;}
+.chat{width:10%}
+            
+    </style>
+
+    </head>
+
+    <body>
+        <div>
+            <textarea id="chatlog" class="chat_log" readonly></textarea>
+        </div>
+
+        <!--div id="box" class="box"-->
+            <script src="http://localhost:3305/socket.io/socket.io.js"></script>
+            <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+            <script>
+                var socket=io('http://localhost:3305');
+                // $('#chat').on('submit',function(e){
+                //     socket.emit('send message',$('#name').val(),$('#message').val());
+                //     $('#message').val("");
+                //     e.preventDefault();
+                // });
+                socket.on('receive message',function(msg){
+                    $('#chatlog').append(msg+"\n");
+                    $('#chatlog').scrollTop($('#chatlog').innerHeight())
+                });
+
+                socket.on('receive voice message',function(msg){
+                  $('#chatlog').append("voice msg"+msg+"\n");
+                    $('#chatlog').scrollTop($('#chatlog').innerHeight())
+                });
+                // socket.on('change name',function(name){
+                //     $('#name').val(name);
+                // });
+            </script>
+    </body>
+</html>
