@@ -1,44 +1,76 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>client</title>
-        <style>
-.chat_log{width:95%;height: 200px;}
-.name{width:10%;}
-.message{width:70%;}
-.chat{width:10%}
-            
+
+<head>
+    <meta charset="utf-8">
+    <title>client</title>
+    <style>
+        body{
+            text-align: center;
+        }
+        h1{
+            color:blue;
+        }
+        .chat_log {
+            width:640px;
+            height: 240px;
+        }
+
+        .name {
+            width: 10%;
+        }
+
+        .message {
+            width: 70%;
+        }
+
+        .chat {
+            width: 10%
+        }
+        .view{
+            display: inline-block;
+            width:640px;
+            height: 480px;
+            border-style: solid;
+            border-width: 3px;
+            border-color: blue;
+        }
     </style>
 
-    </head>
+</head>
 
-    <body>
-        <div>
-            <textarea id="chatlog" class="chat_log" readonly></textarea>
-        </div>
+<body>
+    <div class="view">  
+        <h1>교수님의 강의 화면</h1>
+    </div>
+    <br>
+    <br>
+    <div>
+        <textarea id="chatlog" class="chat_log" readonly></textarea>
+    </div>
 
-        <!--div id="box" class="box"-->
-            <script src="http://localhost:3305/socket.io/socket.io.js"></script>
-            <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-            <script>
-                var socket=io('http://localhost:3305');
-                // $('#chat').on('submit',function(e){
-                //     socket.emit('send message',$('#name').val(),$('#message').val());
-                //     $('#message').val("");
-                //     e.preventDefault();
-                // });
-                socket.on('receive message',function(msg){
-                    $('#chatlog').append(msg+"\n");
-                    $('#chatlog').scrollTop($('#chatlog').innerHeight())
-                });
+    <!--div id="box" class="box"-->
+    <script src="http://localhost:3305/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+        var socket = io('http://localhost:3305');
+        // $('#chat').on('submit',function(e){
+        //     socket.emit('send message',$('#name').val(),$('#message').val());
+        //     $('#message').val("");
+        //     e.preventDefault();
+        // });
+        socket.on('receive message', function (msg) {
+            $('#chatlog').append(msg + "\n");
+            $('#chatlog').scrollTop($('#chatlog').innerHeight())
+        });
 
-                socket.on('receive voice message',function(msg){
-                  $('#chatlog').append("voice msg"+msg+"\n");
-                    $('#chatlog').scrollTop($('#chatlog').innerHeight())
-                });
+        socket.on('receive voice message', function (msg) {
+            $('#chatlog').append("voice msg" + msg + "\n");
+            $('#chatlog').scrollTop($('#chatlog').innerHeight())
+        });
                 // socket.on('change name',function(name){
                 //     $('#name').val(name);
                 // });
-            </script>
-    </body>
+    </script>
+</body>
+
 </html>
