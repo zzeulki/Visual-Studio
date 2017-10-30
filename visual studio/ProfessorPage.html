@@ -4,12 +4,32 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Professor</title>
+	<style>
+		div{
+			display: inline-block;
+		}
+		body{
+			text-align: center;
+		}
+		img {
+
+			width: 200;
+			height: 200;
+		}
+	</style>
 </head>
 
 <body>
-	<input type="button" value="데이타 전송 시작" onclick="startRecord();">
-	<input type="button" value="데이타 전송 종료" onclick="stopRecord()">
-	
+	<img src="media/logo.jpg" alt="교수님의 강의">
+	<br>
+	<div>
+	<button id="start"><img src="media/start.jpg" alt="강의 시작" onclick="startRecord();"></button>
+	<p>강의 시작</p>
+	</div>
+	<div>
+	<button id="start"><img src="media/stop.jpg" alt="강의 종료" onclick="stopRecord();"></button>
+	<p>강의 종료</p>
+	</div>
 	<script src="//www.WebRTC-Experiment.com/RecordRTC.js"></script>
 	<script src="BinaryJS.js"></script>
 	<script>

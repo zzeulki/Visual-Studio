@@ -1,14 +1,34 @@
 <html>
 <head>
-	<title>Main Page Example</title>
+	<title>Visual Studio</title>
+	<style>
+		#info{
+			font-size:30px;
+		}
+		body{
+			text-align: center;
+
+		}
+		form{
+			display: inline-block;
+
+		}
+		img {
+
+			width: 200;
+			height: 200;
+		}
+	</style>
 </head>
 <body>
-	<p id="info"></p>
+	<p id="info">VISUAL STUDIO</p>
 	<form action="http://localhost:4000/professor" method="post">
-		<button id="professor">Professor</button>
+		<button id="professor"><img src="media/ProfessorButton.jpg" alt="Professor"></button>
+		<p>교수님</p>
 	</form>
 	<form action="http://localhost:4000/student" method="post">
-		<button id="student">Student</button>
+		<button id="student"><img src="media/StudentButton.png" alt="Student"></button>
+		<p>학생</p>
 	</form>
 	
 </body>	
