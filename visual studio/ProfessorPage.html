@@ -16,6 +16,11 @@
 			width: 200;
 			height: 200;
 		}
+		video {
+  		  	width: 640px;
+    		height: 480px;
+    		border: 1px solid #e2e2e2;
+  		}
 	</style>
 </head>
 
@@ -29,9 +34,14 @@
 	<div>
 	<button id="start"><img src="media/stop.jpg" alt="강의 종료" onclick="stopRecord();"></button>
 	<p>강의 종료</p>
+	
+	<video id="video" autoplay></video>
+	
 	</div>
 	<script src="//www.WebRTC-Experiment.com/RecordRTC.js"></script>
+	<script src="https://cdn.webrtc-experiment.com/getScreenId.js"> </script>
 	<script src="BinaryJS.js"></script>
+	
 	<script>
 		var client = new BinaryClient('ws://127.0.0.1:3306');
 
@@ -93,7 +103,42 @@
 				window.Stream.write(convertFloat32ToInt16(left));
 			}
 
+			getScreenId(function(error, sourceId, screen_constraints) {
+                // error    == null || 'permission-denied' || 'not-installed' || 'installed-disabled' || 'not-chrome'
+                // sourceId == null || 'string' || 'firefox'
+                // getUserMedia(screen_constraints, onSuccess, onFailure);
+                window.IsAndroidChrome = false;
+                if (IsAndroidChrome) {
+                    screen_constraints = {
+                        mandatory: {
+                            chromeMediaSource: 'screen'
+                        },
+                        optional: []
+                    };
+                    
+                    screen_constraints = {
+                        video: screen_constraints
+                    };
+                    error = null;
+                }
+                
+                navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
+                navigator.getUserMedia(screen_constraints, function(stream) {
+                    // share this "MediaStream" object using RTCPeerConnection API
+                    document.querySelector('video').src = URL.createObjectURL(stream);
+                   
+                    stream.oninactive = stream.onended = function() {
+                        document.querySelector('video').src = null;
+                        document.getElementById('capture-screen').disabled = false;
+                    };
+                    
+                    document.getElementById('capture-screen').disabled = false;
+                }, function(error) {
+                    console.error('getScreenId error', error);
+                    alert('Failed to capture your screen. Please check Chrome console logs for further information.');
+                });
 
+			});
 
 		}
 		function stopRecord() {
@@ -101,6 +146,7 @@
 			audioInput.disconnect();
 			recorder.disconnect(context.destination);
 		}
+		
 	</script>
 </body>
 
