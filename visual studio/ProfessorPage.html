@@ -31,21 +31,11 @@
 	<p>강의 시작</p>
 	<video id="video" src=null></video>
 	</div>
-<<<<<<< HEAD
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
 	<script src="https://cdn.webrtc-experiment.com/getScreenId.js"> </script>
 	 <script src="http://localhost:3305/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-=======
-	<div>
-	<button id="start"><img src="media/stop.jpg" alt="강의 종료" onclick="stopRecord();"></button>
-	<p>강의 종료</p>
-	
-	<video id="video" autoplay></video>
-	
-	</div>
->>>>>>> origin/master
 	<script src="//www.WebRTC-Experiment.com/RecordRTC.js"></script>
 	<script src="https://cdn.webrtc-experiment.com/getScreenId.js"> </script>
 	<script src="BinaryJS.js"></script>
@@ -167,7 +157,6 @@
 					// connect our recorder to the previous destination
 					recorder.connect(context.destination);
 				}
-<<<<<<< HEAD
 
 				function convertFloat32ToInt16(buffer) {
 					l = buffer.length;
@@ -199,60 +188,7 @@
 			});
 		
 		};
-=======
-				return buf.buffer;
-			}
 
-			function recorderProcess(e) {
-				var left = e.inputBuffer.getChannelData(0);
-				window.Stream.write(convertFloat32ToInt16(left));
-			}
-
-			getScreenId(function(error, sourceId, screen_constraints) {
-                // error    == null || 'permission-denied' || 'not-installed' || 'installed-disabled' || 'not-chrome'
-                // sourceId == null || 'string' || 'firefox'
-                // getUserMedia(screen_constraints, onSuccess, onFailure);
-                window.IsAndroidChrome = false;
-                if (IsAndroidChrome) {
-                    screen_constraints = {
-                        mandatory: {
-                            chromeMediaSource: 'screen'
-                        },
-                        optional: []
-                    };
-                    
-                    screen_constraints = {
-                        video: screen_constraints
-                    };
-                    error = null;
-                }
-                
-                navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
-                navigator.getUserMedia(screen_constraints, function(stream) {
-                    // share this "MediaStream" object using RTCPeerConnection API
-                    document.querySelector('video').src = URL.createObjectURL(stream);
-                   
-                    stream.oninactive = stream.onended = function() {
-                        document.querySelector('video').src = null;
-                        document.getElementById('capture-screen').disabled = false;
-                    };
-                    
-                    document.getElementById('capture-screen').disabled = false;
-                }, function(error) {
-                    console.error('getScreenId error', error);
-                    alert('Failed to capture your screen. Please check Chrome console logs for further information.');
-                });
-
-			});
-
-		}
-		function stopRecord() {
-			alert("전송종료");
-			audioInput.disconnect();
-			recorder.disconnect(context.destination);
-		}
-		
->>>>>>> origin/master
 	</script>
 </body>
 
