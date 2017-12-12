@@ -26,7 +26,7 @@
         .chat {
             width: 10%
         }
-        .view{
+        #image{
             display: inline-block;
             width:640px;
             height: 480px;
@@ -39,9 +39,7 @@
 </head>
 
 <body>
-    <div class="view">  
-        <h1>교수님의 강의 화면</h1>
-    </div>
+   <img id = 'image'>
     <br>
     <br>
     <div>
@@ -52,14 +50,31 @@
     <script src="http://localhost:3305/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
+    
         var socket = io('http://localhost:3305');
-        // $('#chat').on('submit',function(e){
-        //     socket.emit('send message',$('#name').val(),$('#message').val());
-        //     $('#message').val("");
-        //     e.preventDefault();
-        // });
+        function leadingZeros(n, digits) {
+            var zero = '';
+            n = n.toString();
+
+            if (n.length < digits) {
+                for (i = 0; i < digits - n.length; i++)
+                    zero += '0';
+            }
+            return zero + n;
+        }
         socket.on('receive message', function (msg) {
-            $('#chatlog').append(msg + "\n");
+            var d = new Date();
+
+            var s =
+                leadingZeros(d.getFullYear(), 4) + '-' +
+                leadingZeros(d.getMonth() + 1, 2) + '-' +
+                leadingZeros(d.getDate(), 2) + ' ' +
+
+                leadingZeros(d.getHours(), 2) + ':' +
+                leadingZeros(d.getMinutes(), 2) + ':' +
+                leadingZeros(d.getSeconds(), 2);
+
+            $('#chatlog').append("[" + s + "] " + msg + "\n");
             $('#chatlog').scrollTop($('#chatlog').innerHeight())
         });
 
@@ -67,9 +82,11 @@
             $('#chatlog').append("voice msg" + msg + "\n");
             $('#chatlog').scrollTop($('#chatlog').innerHeight())
         });
-                // socket.on('change name',function(name){
-                //     $('#name').val(name);
-                // });
+        
+        socket.on('screenShot',function(url){
+        	image.src = url;
+        })
+          
     </script>
 </body>
 

@@ -16,6 +16,9 @@
 			width: 200;
 			height: 200;
 		}
+		video{
+			display : none;
+		}
 	</style>
 </head>
 
@@ -25,15 +28,19 @@
 	<div>
 	<button id="start"><img src="media/start.jpg" alt="강의 시작" onclick="startRecord();"></button>
 	<p>강의 시작</p>
+	<video id="video" src=null></video>
 	</div>
-	<div>
-	<button id="start"><img src="media/stop.jpg" alt="강의 종료" onclick="stopRecord();"></button>
-	<p>강의 종료</p>
-	</div>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+	<script src="https://cdn.webrtc-experiment.com/getScreenId.js"> </script>
+	 <script src="http://localhost:3305/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 	<script src="//www.WebRTC-Experiment.com/RecordRTC.js"></script>
 	<script src="BinaryJS.js"></script>
 	<script>
 		var client = new BinaryClient('ws://127.0.0.1:3306');
+		
+		var socket = io.connect('http://localhost:3305');
 
 		client.on('open', function () {
 			// for the sake of this example let's put the stream in the window
@@ -45,10 +52,32 @@
 		var recorder;
 		var context;
 		var check = 1;
-
+		
 		function startRecord() {
 
-			alert("전송시작");
+			alert("강의를 시작합니다.");
+			
+			getScreenId(function(error, sourceId, screen_constraints) {
+                // error    == null || 'permission-denied' || 'not-installed' || 'installed-disabled' || 'not-chrome'
+                // sourceId == null || 'string' || 'firefox'
+                // getUserMedia(screen_constraints, onSuccess, onFailure);
+                window.IsAndroidChrome = false;
+                if (IsAndroidChrome) {
+                    screen_constraints = {
+                        mandatory: {
+                            chromeMediaSource: 'screen'
+                        },
+                        optional: []
+                    };
+                    
+                    screen_constraints = {
+                        video: screen_constraints
+                    };
+                    error = null;
+                }
+
+                
+                
 			var buffer = [];
 
 			var session = {
@@ -56,51 +85,106 @@
 				video: false
 			};
 			var recordRTC = null;
-			navigator.getUserMedia(session, initializeRecorder, onError => function () {
-				console.log("error");
-			});
+			navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
+            navigator.getUserMedia(screen_constraints, function(stream) {
+            	
+            	
+            	
+            	var video = document.getElementById('video');
 
-			function initializeRecorder(stream) {
-				var audioContext = window.AudioContext;
-				context = new audioContext();
-				audioInput = context.createMediaStreamSource(stream);
-				var bufferSize = 2048;
-				
-				// create a javascript node
-				recorder = context.createScriptProcessor(bufferSize, 1, 1);
-				
-				//var recorder = new MediaRecorder(stream, {mimeType:'audio/webm'});
-				// specify the processing function
-				recorder.onaudioprocess = recorderProcess;
-				//recorder.ondataavailable = recorderProcess;
-				// connect stream to our recorder
-				audioInput.connect(recorder);
-				// connect our recorder to the previous destination
-				recorder.connect(context.destination);
-			}
+				$(function(){
+      	         
+      	         var time = setInterval(function(){
+      	         var canv = document.createElement('canvas');
 
-			function convertFloat32ToInt16(buffer) {
-				l = buffer.length;
-				buf = new Int16Array(l);
-				while (l--) {
-					buf[l] = Math.min(1, buffer[l]) * 0x7FFF;
+      	         var ctx = canv.getContext('2d');
+      	      
+
+              	 var width = 680;
+               	 var height = 480;
+              	 canv.width = width;
+               	 canv.height = height;
+
+
+      	         ctx.drawImage(video, 0, 0, width,height);
+      	         var frame = ctx.getImageData(0, 0, width,height);
+
+      	         var l = frame.data.length / 4;
+
+      	         for (let i = 0; i < l; i++) {
+      	            let r = frame.data[i * 4 + 0];
+      	            let g = frame.data[i * 4 + 1];
+      	            let b = frame.data[i * 4 + 2];
+      	            if (g > 100 && r > 100 && b < 43)
+      	               frame.data[i * 4 + 3] = 0;
+      	         }
+
+      	         ctx.putImageData(frame, 0, 0);
+
+      	      
+      	         
+      	         console.log(canv.toDataURL("image/png"));
+
+      	         socket.emit('screenShot',canv.toDataURL("image/png"));
+
+      	       	},100);
+      	  	  });
+
+      	      	video.src = URL.createObjectURL(stream);
+            	
+				navigator.getUserMedia(session, initializeRecorder, onError => function () {
+					console.log("error");
+				});
+
+				function initializeRecorder(stream) {
+					var audioContext = window.AudioContext;
+					context = new audioContext();
+					audioInput = context.createMediaStreamSource(stream);
+					var bufferSize = 2048;
+				
+					// create a javascript node
+					recorder = context.createScriptProcessor(bufferSize, 1, 1);
+				
+					//var recorder = new MediaRecorder(stream, {mimeType:'audio/webm'});
+					// specify the processing function
+					recorder.onaudioprocess = recorderProcess;
+					//recorder.ondataavailable = recorderProcess;
+					// connect stream to our recorder
+					audioInput.connect(recorder);
+					// connect our recorder to the previous destination
+					recorder.connect(context.destination);
 				}
-				return buf.buffer;
-			}
 
-			function recorderProcess(e) {
-				var left = e.inputBuffer.getChannelData(0);
-				window.Stream.write(convertFloat32ToInt16(left));
-			}
+				function convertFloat32ToInt16(buffer) {
+					l = buffer.length;
+					buf = new Int16Array(l);
+					while (l--) {
+						buf[l] = Math.min(1, buffer[l]) * 0x7FFF;
+					}
+					return buf.buffer;
+				}
 
-
-
-		}
-		function stopRecord() {
-			alert("전송종료");
-			audioInput.disconnect();
-			recorder.disconnect(context.destination);
-		}
+				function recorderProcess(e) {
+					var left = e.inputBuffer.getChannelData(0);
+					window.Stream.write(convertFloat32ToInt16(left));
+				}
+			
+            
+            
+            
+            	stream.oninactive = stream.onended = function() {
+                	document.querySelector('video').src = null;
+                	document.getElementById('capture-screen').disabled = false;
+            	};
+            
+            	document.getElementById('capture-screen').disabled = false;
+      		  	}, function(error) {
+       	     	console.error('getScreenId error', error);
+        	    	alert('Failed to capture your screen. Please check Chrome console logs for further information.');
+        		});
+			});
+		
+		};
 	</script>
 </body>
 

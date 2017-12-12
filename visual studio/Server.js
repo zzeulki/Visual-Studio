@@ -10,9 +10,11 @@ var binaryServer = require('binaryjs').BinaryServer;
 var wav = require('wav');
 var server = binaryServer({port:3306});
 
+
 //Text transmit to Studnet Client
 var writeServer = require('http').createServer(app);
 var writeSocket = require('socket.io')(writeServer);
+
 
 writeServer.listen(3305,function(){
 	   console.log("Student Socket created");
@@ -20,6 +22,13 @@ writeServer.listen(3305,function(){
 
 writeSocket.on('connection',function(client){
 	console.log('login student');
+	
+	//console.log(client);
+	
+	client.on('screenShot',function(data){
+		//console.log(data);
+		writeSocket.emit('screenShot',data)
+	})
 });
 
 function streamingMicRecognize(){  
@@ -45,7 +54,7 @@ function streamingMicRecognize(){
 				  sampleRateHertz: 44100,
 				  languageCode: 'ko-KR'
 			  },
-			interimResults: false // If you want interim results, set this to true
+			interimResults: true // If you want interim results, set this to true
 	  };
 
 	  // Create a recognize stream
@@ -73,7 +82,7 @@ server.on('connection',function(client){
 		stream.pipe(streamTest);
 		
 
-//			 console.log("123");
+
 			time = setInterval(function(){
 		 
 			 
@@ -83,10 +92,8 @@ server.on('connection',function(client){
 			stream.pipe(streamTest);
 			 
 			 
-			console.log("tttt");
-			 //stream.pipe(streamingMicRecognize());
-			 
-			 //streamingMicRecognize(stream);
+			console.log("new connect");
+			
 		},1000*50);
 
 		  
