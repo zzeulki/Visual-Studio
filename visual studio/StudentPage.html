@@ -4,14 +4,16 @@
     <meta charset="utf-8">
     <title>client</title>
     <style>
-        body{
+        body {
             text-align: center;
         }
-        h1{
-            color:blue;
+
+        h1 {
+            color: blue;
         }
+
         .chat_log {
-            width:640px;
+            width: 640px;
             height: 240px;
         }
 
@@ -26,9 +28,14 @@
         .chat {
             width: 10%
         }
+<<<<<<< HEAD
         #image{
+=======
+
+        .view {
+>>>>>>> origin/master
             display: inline-block;
-            width:640px;
+            width: 640px;
             height: 480px;
             border-style: solid;
             border-width: 3px;
@@ -39,7 +46,13 @@
 </head>
 
 <body>
+<<<<<<< HEAD
    <img id = 'image'>
+=======
+    <div class="view">
+        <h1>교수님의 강의 화면</h1>
+    </div>
+>>>>>>> origin/master
     <br>
     <br>
     <div>
@@ -52,6 +65,7 @@
     <script>
     
         var socket = io('http://localhost:3305');
+
         function leadingZeros(n, digits) {
             var zero = '';
             n = n.toString();
